@@ -1,12 +1,12 @@
 import org.junit.jupiter.api.Test;
 
 
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 
-import static com.codeborne.selenide.Condition.exactText;
-import static com.codeborne.selenide.Condition.visible;
+import static com.codeborne.selenide.Condition.*;
 import static com.codeborne.selenide.Selectors.byText;
 import static com.codeborne.selenide.Selenide.*;
 
@@ -54,6 +54,22 @@ public class CardDeliveryTest {
         $("[data-test-id=agreement]").click();
         $$("button").find(exactText("Забронировать")).click();
         $(byText("Заказ на выбранную дату невозможен")).shouldBe(visible);
+
+    }
+
+    @Test
+    void ShouldCorrectTest() {
+        String date = setLocalDate(3);
+        open("http://localhost:9999");
+        $("[data-test-id=city] input").setValue("Астрахань");
+        $("[data-test-id=date] input").doubleClick().sendKeys(date);
+        $("[data-test-id=name] input").setValue("Болдырев Анатолий");
+        $("[data-test-id=phone] input").setValue("+79086118185");
+        $("[data-test-id=agreement]").click();
+        $$("button").find(exactText("Забронировать")).click();
+        $(byText("Успешно!")).shouldBe(visible, Duration.ofMillis(15000));
+        $(".notification__content").shouldHave(text("Встреча успешно забронирована на " + date),
+                Duration.ofSeconds(15)).shouldBe(visible);
 
     }
 }
